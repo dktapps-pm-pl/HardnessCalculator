@@ -25,7 +25,7 @@ class Main extends PluginBase implements Listener{
 	}
 
 	public function onBlockBreak(BlockBreakEvent $event){
-		if(isset($this->timers[$event->getPlayer()->getId()])){
+		if(isset($this->timers[$event->getPlayer()->getId()]) and !$event->getInstaBreak()){
 			$actualTime = microtime(true) - $this->timers[$event->getPlayer()->getId()];
 			$expectedTime = $event->getBlock()->getBreakTime($event->getPlayer()->getInventory()->getItemInHand());
 			if($expectedTime <= 0){
