@@ -16,23 +16,27 @@ class Main extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
+	/**
+	 * @var float[]
+	 * @phpstan-var array<int, float>
+	 */
 	private $timers = [];
 
-	public function onPlayerInteract(PlayerInteractEvent $event){
+	public function onPlayerInteract(PlayerInteractEvent $event) : void{
 		if($event->getAction() === PlayerInteractEvent::LEFT_CLICK_BLOCK){
 			$this->timers[$event->getPlayer()->getId()] = microtime(true);
 		}
 	}
 
-	public function onBlockBreak(BlockBreakEvent $event){
+	public function onBlockBreak(BlockBreakEvent $event) : void{
 		if(isset($this->timers[$event->getPlayer()->getId()]) and !$event->getInstaBreak()){
 			$actualTime = microtime(true) - $this->timers[$event->getPlayer()->getId()];
-			$expectedTime = $event->getBlock()->getBreakTime($event->getPlayer()->getInventory()->getItemInHand());
+			$expectedTime = $event->getBlock()->getBreakInfo()->getBreakTime($event->getPlayer()->getInventory()->getItemInHand());
 			if($expectedTime <= 0){
 				return;
 			}
 			$ratio = $actualTime / $expectedTime;
-			$expectedHardness = $event->getBlock()->getHardness();
+			$expectedHardness = $event->getBlock()->getBreakInfo()->getHardness();
 			$computedHardness = $expectedHardness * $ratio;
 
 			$color = ($ratio < 0.95 or $ratio > 1.05) ? TextFormat::RED : TextFormat::GREEN;
